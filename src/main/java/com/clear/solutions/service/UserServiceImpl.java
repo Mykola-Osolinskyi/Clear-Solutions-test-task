@@ -19,7 +19,6 @@ public class UserServiceImpl implements UserService {
 
     @Value("${user.minAge}")
     private int minAge;
-    // todo: how to read value from property file?
 
     @Override
     public User createUser(User user) {
