@@ -19,61 +19,36 @@ public class UserServiceImpl implements UserService {
 
     @Value("${user.minAge}")
     private int minAge;
-    // todo: how to read value from property file?
 
     @Override
     public User createUser(User user) {
-        if (isAdult(user)) {
-            //todo: should we add another checks?
-            userRepository.users.add(user);
-            return user;
-        } else {
-            throw new IllegalArgumentException("User must be " + minAge + " years old or older");
-        }
+        checkUser(user);
+        userRepository.users.add(user);
+        return user;
     }
 
     @Override
     public User updateUser(String email, User updatedUser) {
-        if (!isAdult(updatedUser)) {
-            return null;
-        }
+        checkUser(updatedUser);
         int index = userRepository.users.indexOf(getUserByEmail(email));
-        if (index != - 1) {
-            userRepository.users.set(index, updatedUser);
-            return updatedUser;
-        } else {
-            return null;
-        }
+        userRepository.users.set(index, updatedUser);
+        return updatedUser;
     }
 
     @Override
     public User patchUser(String email, Map<String, Object> updates) {
         User existingUser = getUserByEmail(email);
-        if (existingUser == null) {
-            // todo:
-            return null;
-        }
+
         for (String key : updates.keySet()) {
             switch (key) {
-                case "firstName":
-                    existingUser.setFirstName((String) updates.get(key));
-                    break;
-                case "lastName":
-                    existingUser.setLastName((String) updates.get(key));
-                    break;
-                case "birthDate":
-                    // todo: need to validate age
-//                    validateAge(updates.get(key));
-                    existingUser.setBirthDate((LocalDate) updates.get(key));
-                    break;
-                case "address":
-                    existingUser.setAddress((String) updates.get(key));
-                    break;
-                case "phoneNumber":
-                    existingUser.setPhoneNumber((String) updates.get(key));
-                    break;
-                default:
+                case "firstName" -> existingUser.setFirstName((String) updates.get(key));
+                case "lastName" -> existingUser.setLastName((String) updates.get(key));
+                case "birthDate" -> existingUser.setBirthDate((LocalDate) updates.get(key)); // todo: need to check user age
+                case "address" -> existingUser.setAddress((String) updates.get(key));
+                case "phoneNumber" -> existingUser.setPhoneNumber((String) updates.get(key));
+                default -> {
                     // Handle unsupported fields (optional)
+                }
             }
         }
         return existingUser;
@@ -98,14 +73,19 @@ public class UserServiceImpl implements UserService {
         return results;
     }
 
-    private boolean isAdult(User user) {
-        return LocalDate.now().minusYears(minAge).isBefore(user.getBirthDate());
+    private void checkUser(User user) {
+        if (user == null) {
+            throw new IllegalArgumentException("User must not be null");
+        }
+        if (!LocalDate.now().minusYears(minAge).isBefore(user.getBirthDate())) {
+            throw new IllegalArgumentException("User must be " + minAge + " years old or older");
+        }
     }
 
     private User getUserByEmail(String email) {
-        return userRepository.users.stream().filter(u -> u.getEmail().equals(email)).findFirst()
-                .orElseThrow(() -> new RuntimeException("Can't find user with email: "));
-        // todo: add email to message
+        return userRepository.users.stream()
+                .filter(u -> u.getEmail().equals(email))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Can't find user with email: " + email));
     }
-
 }
