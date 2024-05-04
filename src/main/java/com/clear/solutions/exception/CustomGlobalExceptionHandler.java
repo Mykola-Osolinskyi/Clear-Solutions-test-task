@@ -55,7 +55,6 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
         if (ex.getMessage().contains("Birth date is invalid.")) {
             return new ResponseEntity<>("Birth date is invalid. Check input data please.", HttpStatus.BAD_REQUEST);
         }
-
         return new ResponseEntity<>("An unexpected error occurred. Please try again later.", HttpStatus.BAD_REQUEST);
     }
 }
