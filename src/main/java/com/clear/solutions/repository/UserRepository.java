@@ -1,14 +1,14 @@
 package com.clear.solutions.repository;
 
+import java.util.List;
 import com.clear.solutions.model.User;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Repository
 @Data
+@AllArgsConstructor
 public class UserRepository {
-    public List<User> users = new ArrayList<>();
+    private List<User> users;
 }

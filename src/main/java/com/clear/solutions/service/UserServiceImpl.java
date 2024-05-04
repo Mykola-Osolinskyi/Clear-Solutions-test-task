@@ -1,54 +1,47 @@
 package com.clear.solutions.service;
 
-import com.clear.solutions.model.User;
-import com.clear.solutions.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import com.clear.solutions.model.User;
+import com.clear.solutions.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-
     private final UserRepository userRepository;
-
-    @Value("${user.minAge}")
-    private int minAge;
 
     @Override
     public User createUser(User user) {
-        checkUser(user);
-        userRepository.users.add(user);
+        checkEmailIsAlreadyExisted(user.getEmail());
+        userRepository.getUsers().add(user);
         return user;
     }
 
     @Override
     public User updateUser(String email, User updatedUser) {
-        checkUser(updatedUser);
-        int index = userRepository.users.indexOf(getUserByEmail(email));
-        userRepository.users.set(index, updatedUser);
+        int userIndex = userRepository.getUsers().indexOf(getUserByEmail(email));
+        userRepository.getUsers().set(userIndex, updatedUser);
         return updatedUser;
     }
 
     @Override
-    public User patchUser(String email, Map<String, Object> updates) {
+    public User patchUser(String email, Map<String, String> updates) {
         User existingUser = getUserByEmail(email);
 
         for (String key : updates.keySet()) {
             switch (key) {
-                case "firstName" -> existingUser.setFirstName((String) updates.get(key));
-                case "lastName" -> existingUser.setLastName((String) updates.get(key));
-                case "birthDate" -> existingUser.setBirthDate((LocalDate) updates.get(key)); // todo: need to check user age
-                case "address" -> existingUser.setAddress((String) updates.get(key));
-                case "phoneNumber" -> existingUser.setPhoneNumber((String) updates.get(key));
-                default -> {
-                    // Handle unsupported fields (optional)
-                }
+                case "firstName" -> existingUser.setFirstName(updates.get(key));
+                case "lastName" -> existingUser.setLastName(updates.get(key));
+                case "birthDate" -> existingUser.setBirthDate(LocalDate.parse(updates.get(key)));
+                case "address" -> existingUser.setAddress(updates.get(key));
+                case "phoneNumber" -> existingUser.setPhoneNumber(updates.get(key));
+                default -> log.info("User field: {} doesn't exist", key);
             }
         }
         return existingUser;
@@ -56,7 +49,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean deleteUser(String email) {
-        return userRepository.users.remove(getUserByEmail(email));
+        return userRepository.getUsers().remove(getUserByEmail(email));
     }
 
     @Override
@@ -65,27 +58,32 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("From date must be before To date");
         }
         List<User> results = new ArrayList<>();
-        for (User user : userRepository.users) {
-            if ((from == null || user.getBirthDate().isAfter(from)) && (to == null || user.getBirthDate().isBefore(to))) {
+        for (User user : userRepository.getUsers()) {
+            if ((from == null || user.getBirthDate().isAfter(from))
+                    && (to == null || user.getBirthDate().isBefore(to))) {
                 results.add(user);
             }
         }
         return results;
     }
 
-    private void checkUser(User user) {
-        if (user == null) {
-            throw new IllegalArgumentException("User must not be null");
-        }
-        if (!LocalDate.now().minusYears(minAge).isBefore(user.getBirthDate())) {
-            throw new IllegalArgumentException("User must be " + minAge + " years old or older");
+    @Override
+    public User getByEmail(String email) {
+        int index = userRepository.getUsers().indexOf(getUserByEmail(email));
+        return userRepository.getUsers().get(index);
+    }
+
+    private void checkEmailIsAlreadyExisted(String email) {
+        if (userRepository.getUsers().stream()
+                .anyMatch(u -> u.getEmail().equals(email))) {
+            throw new IllegalArgumentException("User already exist, email:" + email);
         }
     }
 
     private User getUserByEmail(String email) {
-        return userRepository.users.stream()
+        return userRepository.getUsers().stream()
                 .filter(u -> u.getEmail().equals(email))
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("Can't find user with email: " + email));
+                .orElseThrow(() -> new RuntimeException("User not found, email: " + email));
     }
 }
