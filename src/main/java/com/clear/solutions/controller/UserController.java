@@ -6,19 +6,13 @@ import java.util.Map;
 import com.clear.solutions.model.User;
 import com.clear.solutions.service.UserService;
 import com.clear.solutions.service.UserValidatorService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "User management", description = "Endpoints for managing users")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/users")
@@ -28,6 +22,7 @@ public class UserController {
 
 
     @PostMapping
+    @Operation(summary = "Create a new user", description = "Create a new user")
     public ResponseEntity<User> createUser(@RequestBody User user) {
         validatorService.validateUser(user);
         User createdUser = userServiceImpl.createUser(user);
@@ -35,6 +30,7 @@ public class UserController {
     }
 
     @PutMapping("/{email}")
+    @Operation(summary = "Update a user", description = "Update a user")
     public ResponseEntity<User> updateUser(@PathVariable String email, @RequestBody User user) {
         validatorService.validateUser(user);
         User updatedUser = userServiceImpl.updateUser(email, user);
@@ -42,6 +38,7 @@ public class UserController {
     }
 
     @PatchMapping("/{email}")
+    @Operation(summary = "Update some user fields", description = "Update some user fields")
     public ResponseEntity<User> patchUser(@PathVariable String email, @RequestBody Map<String, String> updates) {
         validatorService.validateEmail(email);
         User user = userServiceImpl.patchUser(email, updates);
@@ -50,6 +47,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{email}")
+    @Operation(summary = "Delete user", description = "Delete user")
     public ResponseEntity<?> deleteUser(@PathVariable String email) {
         validatorService.validateEmail(email);
         userServiceImpl.deleteUser(email);
@@ -57,6 +55,7 @@ public class UserController {
     }
 
     @GetMapping("/search")
+    @Operation(summary = "Get list of users", description = "Get list of users. Search for users by birth date range")
     public ResponseEntity<List<User>> searchUsers(@RequestParam(required = false) LocalDate from, @RequestParam(required = false) LocalDate to) {
         if (from != null && to != null && from.isAfter(to)) {
             throw new IllegalArgumentException("From date must be before To date");
@@ -66,6 +65,7 @@ public class UserController {
     }
 
     @GetMapping("/{email}")
+    @Operation(summary = "Get user by email", description = "Get user by email")
     public ResponseEntity<User> getByEmail(@PathVariable String email) {
         validatorService.validateEmail(email);
         User user = userServiceImpl.getByEmail(email);
