@@ -12,14 +12,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "User management", description = "Endpoints for managing users")
+@Tag(name = "User management",
+        description = "Endpoints for managing users")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserController {
     private final UserService userServiceImpl;
     private final UserValidatorService validatorService;
-
 
     @PostMapping
     @Operation(summary = "Create a new user", description = "Create a new user")
@@ -30,20 +30,26 @@ public class UserController {
     }
 
     @PutMapping("/{email}")
-    @Operation(summary = "Update a user", description = "Update a user")
-    public ResponseEntity<User> updateUser(@PathVariable String email, @RequestBody User user) {
+    @Operation(summary = "Update an existing user", description = "Update an existing user")
+    public ResponseEntity<User> updateUser(@PathVariable String email,
+                                           @RequestBody User user) {
         validatorService.validateUser(user);
         User updatedUser = userServiceImpl.updateUser(email, user);
-        return updatedUser != null ? ResponseEntity.ok(updatedUser) : ResponseEntity.notFound().build();
+        return updatedUser != null
+                ? ResponseEntity.ok(updatedUser)
+                : ResponseEntity.notFound().build();
     }
 
     @PatchMapping("/{email}")
     @Operation(summary = "Update some user fields", description = "Update some user fields")
-    public ResponseEntity<User> patchUser(@PathVariable String email, @RequestBody Map<String, String> updates) {
+    public ResponseEntity<User> patchUser(@PathVariable String email,
+                                          @RequestBody Map<String, String> updates) {
         validatorService.validateEmail(email);
         User user = userServiceImpl.patchUser(email, updates);
         validatorService.validateUser(user);
-        return user != null ?  ResponseEntity.ok(user) : ResponseEntity.notFound().build();
+        return user != null
+                ? ResponseEntity.ok(user)
+                : ResponseEntity.notFound().build();
     }
 
     @DeleteMapping("/{email}")
@@ -55,8 +61,10 @@ public class UserController {
     }
 
     @GetMapping("/search")
-    @Operation(summary = "Get list of users", description = "Get list of users. Search for users by birth date range")
-    public ResponseEntity<List<User>> searchUsers(@RequestParam(required = false) LocalDate from, @RequestParam(required = false) LocalDate to) {
+    @Operation(summary = "Get list of users searched by birth date range",
+            description = "Get list of users. Search for users by birth date range")
+    public ResponseEntity<List<User>> searchUsers(@RequestParam(required = false) LocalDate from,
+                                                  @RequestParam(required = false) LocalDate to) {
         if (from != null && to != null && from.isAfter(to)) {
             throw new IllegalArgumentException("From date must be before To date");
         }

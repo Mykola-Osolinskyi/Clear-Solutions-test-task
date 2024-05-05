@@ -11,7 +11,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserValidatorService {
     public static final Pattern VALID_EMAIL_ADDRESS_REGEX =
-            Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+            Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$",
+                    Pattern.CASE_INSENSITIVE);
 
     @Value("${user.minAge}")
     public int minAge;
@@ -37,7 +38,8 @@ public class UserValidatorService {
     }
 
     private void validateName(User user) {
-        if (isNullOrEmpty(user.getFirstName()) || isNullOrEmpty(user.getLastName())) {
+        if (isNullOrEmpty(user.getFirstName())
+                || isNullOrEmpty(user.getLastName())) {
             throw new UserValidationException("First name or last name is null or empty");
         }
     }

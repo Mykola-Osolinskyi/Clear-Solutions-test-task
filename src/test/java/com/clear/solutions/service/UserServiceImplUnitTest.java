@@ -22,7 +22,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplUnitTest {
-
     @Mock
     private UserRepository userRepository;
     @InjectMocks
@@ -40,7 +39,6 @@ class UserServiceImplUnitTest {
     void tearDown() {
         userRepository.setUsers(emptyList());
     }
-
 
     @Test
     public void createUser_shouldReturnValidUser() {
@@ -60,7 +58,8 @@ class UserServiceImplUnitTest {
         //given
         User user = buildDefaultUser();
         //when
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> userService.createUser(user));
+        Exception exception = assertThrows(IllegalArgumentException.class,
+                () -> userService.createUser(user));
         //then
         assertEquals("User already exist, email:" + user.getEmail(), exception.getMessage());
     }
@@ -84,7 +83,8 @@ class UserServiceImplUnitTest {
         String email = "new@email.com";
         User userWithUpdates = buildUserWithUpdates();
         //when
-        Exception exception = assertThrows(RuntimeException.class, () -> userService.updateUser(email, userWithUpdates));
+        Exception exception = assertThrows(RuntimeException.class,
+                () -> userService.updateUser(email, userWithUpdates));
         //then
         assertEquals("User not found, email: " + email, exception.getMessage());
     }
@@ -111,7 +111,8 @@ class UserServiceImplUnitTest {
         Map<String, String> updates = new HashMap<>();
         updates.put("firstName", "Billy");
         //when
-        Exception exception = assertThrows(RuntimeException.class, () -> userService.patchUser(email, updates));
+        Exception exception = assertThrows(RuntimeException.class,
+                () -> userService.patchUser(email, updates));
         //then
         assertEquals("User not found, email: " + email, exception.getMessage());
     }
@@ -135,7 +136,8 @@ class UserServiceImplUnitTest {
         //given
         String email = "new@email.com";
         //when
-        Exception exception = assertThrows(RuntimeException.class, () -> userService.deleteUser(email));
+        Exception exception = assertThrows(RuntimeException.class,
+                () -> userService.deleteUser(email));
         //then
         assertEquals("User not found, email: " + email, exception.getMessage());
     }

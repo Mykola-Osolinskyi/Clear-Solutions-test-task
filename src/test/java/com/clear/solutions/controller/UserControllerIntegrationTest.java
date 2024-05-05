@@ -41,13 +41,10 @@ import org.springframework.test.web.servlet.MockMvc;
 @WebMvcTest(UserController.class)
 class UserControllerIntegrationTest {
     private static final String NOT_EXISTING_EMAIL = "notExistingEmail";
-
     @Autowired
     private MockMvc mvc;
-
     @MockBean
     private UserService userService;
-
     @MockBean
     private UserValidatorService validatorService;
 
@@ -212,8 +209,10 @@ class UserControllerIntegrationTest {
         users.add(user);
         LocalDate from = LocalDate.of(1920, 1, 1);
         LocalDate to = LocalDate.of(2030, 1, 1);
-        String jsonFrom = new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(from);
-        String jsonTo = new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(to);
+        String jsonFrom = new ObjectMapper()
+                .registerModule(new JavaTimeModule()).writeValueAsString(from);
+        String jsonTo = new ObjectMapper()
+                .registerModule(new JavaTimeModule()).writeValueAsString(to);
         //when
         when(userService.searchUsers(any(), any()))
                 .thenReturn(users);
@@ -231,8 +230,10 @@ class UserControllerIntegrationTest {
         //given
         LocalDate from = LocalDate.of(2030, 1, 1);
         LocalDate to = LocalDate.of(1920, 1, 1);
-        String jsonFrom = new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(from);
-        String jsonTo = new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(to);
+        String jsonFrom = new ObjectMapper()
+                .registerModule(new JavaTimeModule()).writeValueAsString(from);
+        String jsonTo = new ObjectMapper()
+                .registerModule(new JavaTimeModule()).writeValueAsString(to);
         //when
         doThrow(new IllegalArgumentException("From date must be before To date"));
         //then
@@ -244,7 +245,8 @@ class UserControllerIntegrationTest {
     }
 
     private String mapUserToJson(User user) throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+        ObjectMapper objectMapper = new ObjectMapper()
+                .registerModule(new JavaTimeModule());
         return objectMapper.writeValueAsString(user);
     }
 }

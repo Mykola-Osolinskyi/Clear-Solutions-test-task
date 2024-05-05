@@ -20,7 +20,6 @@ import org.springframework.test.context.TestPropertySource;
 @SpringBootTest(classes = UserValidatorService.class)
 @TestPropertySource(locations = "classpath:application.properties")
 class UserValidatorServiceUnitTest {
-
     @Value("${user.minAge}")
     private int minAge;
 
@@ -38,7 +37,8 @@ class UserValidatorServiceUnitTest {
         User user = buildDefaultUser();
         user.setEmail("");
         //when
-        Exception exception = assertThrows(UserValidationException.class, () -> userValidatorService.validateUser(user));
+        Exception exception = assertThrows(UserValidationException.class,
+                () -> userValidatorService.validateUser(user));
         //then
         assertEquals("Email is null or empty", exception.getMessage());
     }
@@ -49,7 +49,8 @@ class UserValidatorServiceUnitTest {
         User user = buildDefaultUser();
         user.setEmail("invalid.email");
         //when
-        Exception exception = assertThrows(UserValidationException.class, () -> userValidatorService.validateUser(user));
+        Exception exception = assertThrows(UserValidationException.class,
+                () -> userValidatorService.validateUser(user));
         //then
         assertEquals("Email format is invalid", exception.getMessage());
     }
@@ -57,7 +58,8 @@ class UserValidatorServiceUnitTest {
     @Test
     public void validateUser_nullUser_shouldThrowException() {
         //when
-        Exception exception = assertThrows(UserValidationException.class, () -> userValidatorService.validateUser(null));
+        Exception exception = assertThrows(UserValidationException.class,
+                () -> userValidatorService.validateUser(null));
         //then
         assertEquals("User is null", exception.getMessage());
     }
@@ -68,7 +70,8 @@ class UserValidatorServiceUnitTest {
         User user = buildDefaultUser();
         user.setFirstName("");
         //when
-        Exception exception = assertThrows(UserValidationException.class, () -> userValidatorService.validateUser(user));
+        Exception exception = assertThrows(UserValidationException.class,
+                () -> userValidatorService.validateUser(user));
         //then
         assertEquals("First name or last name is null or empty", exception.getMessage());
     }
@@ -79,7 +82,8 @@ class UserValidatorServiceUnitTest {
         User user = buildDefaultUser();
         user.setBirthDate(null);
         //when
-        Exception exception = assertThrows(UserValidationException.class, () -> userValidatorService.validateUser(user));
+        Exception exception = assertThrows(UserValidationException.class,
+                () -> userValidatorService.validateUser(user));
         //then
         assertEquals("Birth date is invalid.", exception.getMessage());
     }
@@ -91,7 +95,8 @@ class UserValidatorServiceUnitTest {
         user.setBirthDate(LocalDate.now().minusYears(14));
         userValidatorService.minAge = minAge;
         //when
-        Exception exception = assertThrows(UserValidationException.class, () -> userValidatorService.validateUser(user));
+        Exception exception = assertThrows(UserValidationException.class,
+                () -> userValidatorService.validateUser(user));
         //then
         assertEquals("User is less then " + minAge + " years", exception.getMessage());
     }
